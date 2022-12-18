@@ -54,13 +54,13 @@ describe("Sign Up Page", () => {
     });
   });
   describe("Interactions", () => {
-    let counter = 0;
     let requestBody;
+    let counter = 0;
     const server = setupServer(
       rest.post("/api/1.0/users", (req, res, ctx) => {
         requestBody = req.body;
-        counter++;
-        return res(ctx.status(200), /**/ ctx.delay(50));
+        counter += 1;
+        return res(ctx.status(200), ctx.delay(200));
       })
     );
 
@@ -105,11 +105,14 @@ describe("Sign Up Page", () => {
       });
     });
     it("disables button when there is an ongoing api call", async () => {
-      server.listen();
       await setup();
       await userEvent.click(button);
       await userEvent.click(button);
-      await screen.findByText("Please check your e-mail to activate your account");
+
+      await screen.findByText(
+        "Please check your e-mail to activate your account"
+      );
+
       expect(counter).toBe(1);
     });
 
@@ -149,7 +152,7 @@ describe("Sign Up Page", () => {
           // the res.once below means it will only use this value one time, then return to 
           // using the default  ctx.status(400)
           // this is an alternative to using "server.resetHandlers()" in the before each
-          return res.once(ctx.status(400));
+          return res.once(ctx.status(400), ctx.delay(200));
         })
       ); 
       await setup();
@@ -168,6 +171,70 @@ describe("Sign Up Page", () => {
         expect(form).not.toBeInTheDocument();
       });
     });
+    it("displays validation message for username", async () => {
+      server.use(
+        rest.post("/api/1.0/users", (req, res, ctx) => {
+          return res(ctx.status(400),ctx.json({
+            validationErrors: {
+              username: "Username cannot be null"
+            }
+          }));
+        })
+      ); 
+      await setup();
+      await userEvent.click(button);
+      const usernameValidationError = await screen.findByText(
+        "Username cannot be null"
+      );
+      expect(usernameValidationError).toBeInTheDocument();
+    });
 
+    it("does not display validation message initially", async () => {
+      await setup();
+      const validationAlert = screen.queryByRole("alert");
+      expect(validationAlert).not.toBeInTheDocument();
+    });
+    it("hides spinner after response received", async () => {
+      server.use(
+        rest.post("/api/1.0/users", (req, res, ctx) => {
+          return res(
+            ctx.status(400),
+            ctx.json({
+              validationErrors: {
+                username: "Username cannot be null",
+              },
+            })
+          );
+        })
+      );
+      await setup();
+
+      await userEvent.click(button);
+
+      await screen.findByText("Username cannot be null");
+      const spinner = screen.queryByRole("status");
+      expect(spinner).not.toBeInTheDocument();
+    });
+    it("enables the button after response received", async () => {
+      server.use(
+        rest.post("/api/1.0/users", (req, res, ctx) => {
+          return res(
+            ctx.status(400),
+            ctx.json({
+              validationErrors: {
+                username: "Username cannot be null",
+              },
+            })
+          );
+        })
+      );
+      await setup();
+
+      await userEvent.click(button);
+
+      await screen.findByText("Username cannot be null");
+
+      expect(button).toBeEnabled();
+    });
   });
 });

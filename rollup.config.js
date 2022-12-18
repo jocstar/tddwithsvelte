@@ -53,13 +53,14 @@ export default {
         spa: "public/index.html",
         proxy: [{ from: "/api/*", to: "localhost:8080/api/*" }],
       }),
+
 */
-    !production &&
+!production &&
       localdev({
         dirs: ["public"],
-        host: "localhost",
-        port: 9876,
-        spa: true,
+        port: 9800,
+        silent: false,
+        host: "127.0.0.1",
         proxy: {
           "/api/*": "localhost:8080",
         },
@@ -67,11 +68,11 @@ export default {
 
     // Watch the `public` directory and refresh the
     // browser on changes when not in production
-    !production && livereload("public"),
-    //      livereload({
-    //        watch: "public",
-    //        port: 9876,
-    //      }),
+    !production && 
+          livereload({
+            watch: "public",
+            port: 9800,
+          }),
 
     // If we're building for production (npm run build
     // instead of npm run dev), minify
