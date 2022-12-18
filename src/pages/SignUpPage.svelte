@@ -1,9 +1,22 @@
 <script>
   import axios from "axios";
+  import Input from "../components/input.svelte";
   let disabled = true;
-  let username, email, password, passwordRepeat;
+  let form = {
+    username: "",
+    email: "",
+    password: "",
+    passwordRepeat: "",
+  };
 
-  $: disabled = password && passwordRepeat ? password !== passwordRepeat : true;
+  let passwordMismatch = false;
+
+  $: disabled =
+    form.password && form.passwordRepeat
+      ? form.password !== form.passwordRepeat
+      : true;
+
+  $: passwordMismatch = form.password !== form.passwordRepeat;
 
   let apiProgress = false;
   let signUpSucess = false;
@@ -11,6 +24,7 @@
 
   const submit = () => {
     apiProgress = true;
+    const { username, email, password } = form;
     axios
       .post("/api/1.0/users", { username, email, password })
       .then(() => {
@@ -23,6 +37,26 @@
         apiProgress = false;
       });
   };
+
+  const onChange = (event) => {
+    const { id, value } = event.target;
+    form[id] = value;
+    errors[id] = "";
+  };
+  /*
+  const onChangeUsername = (event) => {
+    username = event.target.value;
+  };
+  const onChangeEmail = (event) => {
+    email = event.target.value;
+  };
+  const onChangePassword = (event) => {
+    password = event.target.value;
+  };
+  const onChangePasswordRepeat = (event) => {
+    passwordRepeat = event.target.value;
+  };
+*/
 </script>
 
 <div class="col-lg-6 offset-lg-3 col-md-8 offset-md-2">
@@ -32,35 +66,33 @@
         <h1 class="text-center">Sign Up</h1>
       </div>
       <div class="card-body">
-        <div class="form-group">
-          <label for="username">Username</label>
-          <input id="username" class="form-control" bind:value={username} />
-          {#if errors.username}
-            <span role="alert">{errors.username}</span>
-          {/if}
-        </div>
-        <div class="form-group">
-          <label for="e-mail">E-mail</label>
-          <input id="e-mail" class="form-control" bind:value={email} />
-        </div>
-        <div class="form-group">
-          <label for="password">Password</label>
-          <input
-            id="password"
-            type="password"
-            class="form-control"
-            bind:value={password}
-          />
-        </div>
-        <div class="form-group">
-          <label for="password-repeat">Password Repeat</label>
-          <input
-            id="password-repeat"
-            type="password"
-            class="form-control"
-            bind:value={passwordRepeat}
-          />
-        </div>
+        <Input
+          id="username"
+          label="Username"
+          help={errors.username}
+          on:input={onChange}
+        />
+        <Input
+          id="email"
+          label="E-mail"
+          help={errors.email}
+          on:input={onChange}
+        />
+        <Input
+          id="password"
+          label="Password"
+          type="password"
+          help={errors.password}
+          on:input={onChange}
+        />
+        <Input
+          id="passwordRepeat"
+          label="Password Repeat"
+          type="password"
+          help={passwordMismatch ? "Password mismatch" : ""}
+          on:input={onChange}
+        />
+
         <div class="text-center">
           <button
             class="btn btn-primary"
