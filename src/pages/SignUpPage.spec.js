@@ -1,7 +1,6 @@
 import SignUpPage from "./SignUpPage.svelte";
 import { render, screen, waitFor } from "@testing-library/svelte";
 import userEvent from "@testing-library/user-event";
-
 import { setupServer } from "msw/node";
 import { rest } from "msw";
 

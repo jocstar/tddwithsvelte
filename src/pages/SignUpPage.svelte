@@ -1,4 +1,5 @@
 <script>
+  import { _ } from "svelte-i18n";
   import axios from "axios";
   import Input from "../components/input.svelte";
   let disabled = true;
@@ -43,51 +44,37 @@
     form[id] = value;
     errors[id] = "";
   };
-  /*
-  const onChangeUsername = (event) => {
-    username = event.target.value;
-  };
-  const onChangeEmail = (event) => {
-    email = event.target.value;
-  };
-  const onChangePassword = (event) => {
-    password = event.target.value;
-  };
-  const onChangePasswordRepeat = (event) => {
-    passwordRepeat = event.target.value;
-  };
-*/
 </script>
 
 <div class="col-lg-6 offset-lg-3 col-md-8 offset-md-2">
   {#if !signUpSucess}
     <form class="card mt-5" data-testid="form-sign-up">
       <div class="card-header">
-        <h1 class="text-center">Sign Up</h1>
+        <h1 class="text-center">{$_("signup")}</h1>
       </div>
       <div class="card-body">
         <Input
           id="username"
-          label="Username"
+          label={$_("username")}
           help={errors.username}
           on:input={onChange}
         />
         <Input
           id="email"
-          label="E-mail"
+          label={$_("email")}
           help={errors.email}
           on:input={onChange}
         />
         <Input
           id="password"
-          label="Password"
+          label={$_("password")}
           type="password"
           help={errors.password}
           on:input={onChange}
         />
         <Input
           id="passwordRepeat"
-          label="Password Repeat"
+          label={$_("passwordRepeat")}
           type="password"
           help={passwordMismatch ? "Password mismatch" : ""}
           on:input={onChange}
@@ -102,7 +89,7 @@
             {#if apiProgress}
               <span class="spinner-border spinner-border-sm" role="status" />
             {/if}
-            Sign Up</button
+            {$_("signup")}</button
           >
         </div>
       </div>
