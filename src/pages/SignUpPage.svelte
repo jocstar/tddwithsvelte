@@ -1,7 +1,7 @@
 <script>
   import { _ } from "svelte-i18n";
-  import axios from "axios";
   import Input from "../components/input.svelte";
+  import { signup } from "../api/apiCalls";
 
   let disabled = true;
   let form = {
@@ -24,20 +24,19 @@
   let signUpSucess = false;
   let errors = {};
 
-  const submit = () => {
+  const submit = async () => {
     apiProgress = true;
     const { username, email, password } = form;
-    axios
-      .post("/api/1.0/users", { username, email, password })
-      .then(() => {
-        signUpSucess = true;
-      })
-      .catch((error) => {
-        if (error.response.status === 400) {
-          errors = error.response.data.validationErrors;
-        }
-        apiProgress = false;
-      });
+
+    try {
+      await signup({ username, email, password });
+      signUpSucess = true;
+    } catch (error) {
+      if (error.response.status === 400) {
+        errors = error.response.data.validationErrors;
+      }
+      apiProgress = false;
+    }
   };
 
   const onChange = (event) => {
@@ -51,7 +50,7 @@
   {#if !signUpSucess}
     <form class="card mt-5" data-testid="form-sign-up">
       <div class="card-header">
-        <h1 class="text-center">{$_("signup")}</h1>
+        <h1 class="text-center">{$_("signUp")}</h1>
       </div>
       <div class="card-body">
         <Input
@@ -73,12 +72,13 @@
           help={errors.password}
           on:input={onChange}
         />
+
         <Input
           id="passwordRepeat"
           label={$_("passwordRepeat")}
-          type="password"
-          help={passwordMismatch ? "Password mismatch" : ""}
+          help={passwordMismatch ? $_("passwordMismatchValidation") : ""}
           on:input={onChange}
+          type="password"
         />
 
         <div class="text-center">
@@ -90,7 +90,7 @@
             {#if apiProgress}
               <span class="spinner-border spinner-border-sm" role="status" />
             {/if}
-            {$_("signup")}</button
+            {$_("signUp")}</button
           >
         </div>
       </div>

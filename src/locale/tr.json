@@ -1,7 +1,8 @@
 {
-  "signup": "kayit ot",
-    "username": "TurkUsername",
-    "email": "TurkE-mail",
-    "password": "TurkPassword",
-    "passwordRepeat": "TurkPassword Repeat"
+  "signUp": "Kayıt Ol",
+  "username": "Kullanıcı Adı",
+  "email": "E-Posta",
+  "password": "Şifre",
+  "passwordRepeat": "Şifre Tekrarı",
+  "passwordMismatchValidation": "Şifreniz eşleşmiyor"
 }
